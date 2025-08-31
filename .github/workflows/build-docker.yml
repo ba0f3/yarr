@@ -3,9 +3,11 @@ on:
   push:
     tags:
       - v*
+  workflow_dispatch:
+  
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: nkanaev/yarr
+  IMAGE_NAME: ba0f3/yarr
 
 jobs:
   build-and-push-image:
@@ -31,11 +33,13 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./etc/dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
